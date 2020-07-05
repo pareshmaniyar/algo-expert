@@ -5,16 +5,14 @@ class GenerateTries {
 	}
 	populateTrie(string) {
 		let n = string.length;
-		for(let i = 0; i < n; i++){
-			let node = this.root;
-			for(let j = i; j < n; j++) {
-				if(!node.hasOwnProperty(string[j])) {
-					node[string[j]] = {};
-				}
-				node = node[string[j]];
+		let node = this.root;
+		for(let j = 0; j < n; j++) {
+			if(!node.hasOwnProperty(string[j])) {
+				node[string[j]] = {};
 			}
-			node["*"] = true;
+			node = node[string[j]];
 		}
+		node["*"] = string;
 	}
 	contains(string){
 		let n = string.length;
@@ -29,10 +27,27 @@ class GenerateTries {
 	}
 }
 function multiStringSearch(bigString, smallStrings) {
-  let trie = new GenerateTries(bigString);
+  let trie = new GenerateTries('');
 	let res = [];
 	smallStrings.forEach( string => {
-		res.push(trie.contains(string));
+		trie.populateTrie(string)
+	});
+	let cache = {};
+	let n = bigString.length;
+	for(let i = 0; i < n; i++) {
+		let node = trie.root;
+		for(let j = i; j < n; j++) {
+			if(!node.hasOwnProperty(bigString[j])){
+				break;
+			}
+			node = node[bigString[j]];
+			if(node.hasOwnProperty('*')) {
+				cache[node['*']] = true;
+			}
+		}
+	}
+	smallStrings.forEach(string => {
+		res.push(cache.hasOwnProperty(string));
 	});
 	return res;
 }
