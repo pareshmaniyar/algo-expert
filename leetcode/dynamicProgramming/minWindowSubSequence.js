@@ -2,6 +2,7 @@
  * @param {string} s1
  * @param {string} s2
  * @return {string}
+ BELOW SOLN GIVES TLE
  s1, s2
  min contiguous substring of s1
  abcdebdde, bde
@@ -9,10 +10,19 @@
  for each letter start and end
     - reach till end
     - if more than min store
+    
+    
+ ACTUAL SOLN WITH LESS TIME
+ pt to next start value
+     - break when end found
+     pt = 0, bde, start = i, end;
+     get b
+     pt++
+     calc end - start and store min
  
  */
 
-    var minWindow = function(s1, s2) {
+     var minWindow = function(s1, s2) {
         const len1 = s1.length;
         const len2 = s2.length;
         let minLength = s1 + s2;
