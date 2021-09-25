@@ -45,3 +45,58 @@ function getValidArray(slices, start) {
 }
 
 
+/*
+
+[1,2,3,4,5,6]
+Brute force
+recursion|backtracking
+[1,2,3,4,5,6]
+.. .. .. .. .. ..
+
+.. .. .. - largest
+.. .. .. .. .. .. - Can't pick adjacent maybe
+1,2,3,4,5,6
+- select n from 3n
+1 - yes, no
+2 - no, yes
+3 - yes, no
+4 - yes, no
+5 - yes, no
+6 - yes, no
+2 ^ n
+1 - yes => 2 - no =>
+1 - no => 2 - yes, no
+
+TLE below soln, no cache
+*/
+
+/**
+ * @param {number[]} slices
+ * @return {number}
+ */
+ var maxSizeSlices = function(slices) {
+    let count = { max: 0 };
+    let left = slices.slice(0, slices.length - 1);
+    let right = slices.slice(1, slices.length);
+    findMaxSum(0, [...left, 0], (slices.length / 3), 0, count, {}, false, []);
+    findMaxSum(0, [0, ...right], (slices.length / 3), 0, count, {}, false, []);
+    return count.max;
+};
+
+function findMaxSum(curr, slices, toBeAdded, currentCount, count, cache, prevTaken) {
+    if(toBeAdded === 0) {
+        count.max = Math.max(count.max, currentCount);
+        // console.log(arr);
+        return;
+    }
+    if(curr === slices.length) return;
+    // yes
+    if(!prevTaken) {
+        findMaxSum(curr + 1, slices, toBeAdded - 1, currentCount + slices[curr], count, cache, true);
+    }
+    // no
+    findMaxSum(curr + 1, slices, toBeAdded, currentCount, count, cache, false);
+}
+
+
+
