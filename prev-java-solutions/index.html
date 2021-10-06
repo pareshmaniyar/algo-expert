@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta http-equiv="cache-control" content="no-cache">
+   <title>Github users</title>
+   <style>
+       .card{
+            min-height: 80px;
+            width: 530px;
+            margin-bottom: 20px;
+            border: 1px solid #BFBFBF;
+            padding: 10px;
+            box-shadow: 1px 1px 1px #aaaaaa;
+            justify-content: space-between;
+       }
+       .card img {
+           width: 70px;
+           height: 70px;
+           border-radius: 50%;
+       }
+       .card button {
+           width: 57px;
+           height: 25px;
+           align-self: flex-end;
+       }
+       .card .first-section {
+           display: flex;
+           justify-content: space-between;
+       }
+       .card .details {
+           margin-left: 10px;
+       }
+       .card .details div:first-child{
+           font-size: 1.5em;
+       }
+   </style>
+</head>
+<body>
+    <div style="width: 550px;margin:auto;">
+        <header style="margin-bottom: 30px;">
+            Filter By Name
+            <input placeholder="Filter" name="name"/>
+        </header>
+        <!-- <div class="card">
+            <div class="first-section">
+                <img src="https://avatars1.githubusercontent.com/u/22147171?v=4">
+                <div class="details">
+                    <div>Name</div>
+                    <div>Profile URL: </div>
+                </div>
+            </div>
+            <button >Details</button>
+        </div>
+        <div class="card">
+            <div class="first-section">
+                <img src="https://avatars1.githubusercontent.com/u/22147171?v=4">
+                <div class="details">
+                    <div>Name</div>
+                    <div>Profile URL: </div>
+                </div>
+            </div>
+            <button>Details</button>
+        </div> -->
+        <div>Total counts <span id="count"></span></div>
+        <p id="demo"></p>
+        <span onclick="loadDoc('a', 1)">1</span>
+        <span onclick="loadDoc('a', 2)">2</span>
+        <span onclick="loadDoc('a', 3)">3</span>
+        <span onclick="loadDoc('a', 4)">4</span>
+    </div>
+    <script>
+        function loadDoc(text, page) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("demo").innerHTML = "";
+                let resp = JSON.parse(this.responseText);
+                document.getElementById("count").innerHTML = resp.total_count;
+                var container = document.getElementById("demo");
+                for (var i = 0; i < resp.items.length; i++) {
+                    var node = document.createElement("DIV");
+                    node.classList.add("card");
+                    var extraNode = document.createElement("DIV");
+                    extraNode.classList.add("first-section");
+                    
+                    var innernode = document.createElement("DIV");
+                    innernode.classList.add("first-section");
+                    
+                    var x = document.createElement("IMG");
+                    x.setAttribute("src", resp.items[i].avatar_url);
+                    x.setAttribute("width", "200");
+                    x.setAttribute("height", "200");
+                    innernode.appendChild(x);
+
+                    var details = document.createElement("DIV");
+                    details.classList.add("details");
+                    
+                    var text = document.createElement("DIV");
+                    var textnode = document.createTextNode(resp.items[i].login);
+                    text.appendChild(textnode);
+                    details.appendChild(text);
+
+                    text = document.createElement("DIV");
+                    textnode = document.createTextNode(" url: " + resp.items[i].html_url);
+                    text.appendChild(textnode);
+                    details.appendChild(text);
+                    
+                    innernode.appendChild(details);
+
+                    extraNode.appendChild(innernode);
+                    var button = document.createElement("BUTTON");
+                    button.innerHTML = "Details";
+                    let url = resp.items[i].repos_url;
+                    let login = resp.items[i].login;
+                    button.setAttribute("class", resp.items[i].login + "cardID");
+                    button.addEventListener('click', () => {
+                        let divShow = document.getElementById(login+ 'cardID');
+                        if(divShow.style.display == "block"){
+                            console.log("block");
+                            divShow.style.display = 'none';
+                        } else {
+                            repositoryCall(url)
+                            console.log("not block but ", divShow.style.display);
+                        }
+                    });
+                    extraNode.appendChild(button);
+                    node.appendChild(extraNode);
+
+                    var addDetails = document.createElement("DIV");
+                    addDetails.classList.add("addDetails");
+                    addDetails.style.display = "none";
+                    addDetails.setAttribute("id", resp.items[i].login + "cardID");
+                    node.appendChild(addDetails);
+
+                    // document.getElementById("demo").appendChild(node);
+                    // node = document.createElement("DIV");
+                    // node.appendChild(textnode);
+                    document.getElementById("demo").appendChild(node);
+                    // container.innerHTML += this.responseText;
+                }
+            }
+            };
+            if(page != undefined)
+                xhttp.open("GET", "https://api.github.com/search/users?q=" + text + "&page=" + page, true);
+            else
+                xhttp.open("GET", "https://api.github.com/search/users?q=" + text, true);
+            xhttp.send();
+        }
+        function updateValue(e) {
+            loadDoc(e.target.value);
+        }
+        loadDoc("a");
+        const input = document.querySelector('input');
+        input.addEventListener('input', updateValue);
+        function repositoryCall(url){
+            console.log("url: ", url);
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // console.log("responseText: ", this.responseText);
+                    let resp = JSON.parse(this.responseText);
+                    let addDetails = document.getElementById(resp[0].owner.login + 'cardID');
+                    for(let i = 0; i < resp.length; i++){
+                        let keyValuePair = document.createElement("DIV");
+                        keyValuePair.innerHTML = resp[i].name + "    ----------------   " + resp[i].language;
+                        addDetails.appendChild(keyValuePair);
+                    }
+                    // addDetails.innerHTML = JSON.stringify(resp);
+                    addDetails.style.display = "block";
+                }
+            }
+            xhttp.open("GET", url, true);
+            xhttp.send();
+        }
+    </script>
+</body>
