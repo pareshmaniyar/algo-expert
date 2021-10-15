@@ -27,7 +27,6 @@ def maxProfit(self, prices):
 ----------------
 
 
-
 */
 // import "fmt"
 func maxProfit(prices []int) int {
